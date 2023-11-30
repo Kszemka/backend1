@@ -57,7 +57,7 @@ func main() {
 }
 
 func getTasks(db *sql.DB) ([]Task, error) {
-	rows, err := db.Query("SELECT t.name, t.deadline, c.category_name FROM tasks t JOIN task_category c ON t.category_id = c.id where t.id=1")
+	rows, err := db.Query("SELECT t.name, t.deadline, c.category_name FROM tasks t JOIN task_category c ON t.category_id = c.id")
 	if err != nil {
 		return nil, err
 	}
