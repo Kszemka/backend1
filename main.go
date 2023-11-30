@@ -24,8 +24,17 @@ func main() {
 		host, port, user, password, dbname)
 
 	db, err := sql.Open("postgres", connStr)
+
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	// Check if the connection to the database is successful
+	err = db.Ping()
+	if err != nil {
+		log.Printf("Failed to connect to the database: %v", err)
+	} else {
+		log.Println("Connected to the database")
 	}
 	defer db.Close()
 
@@ -34,13 +43,16 @@ func main() {
 	mux.HandleFunc("/tasks", func(w http.ResponseWriter, r *http.Request) {
 		tasks, err := getTasks(db)
 		if err != nil {
-			log.Fatal(err)
+			log.Printf("Error retrieving tasks from the database: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
 		}
 
 		// Convert tasks to JSON
 		jsonTasks, err := json.Marshal(tasks)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Printf("Error converting tasks to JSON: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 
